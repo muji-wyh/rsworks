@@ -1,0 +1,18 @@
+[package]
+name = "wasmworks"
+version = "0.0.1"
+authors = ["wyh"]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+path = "rssrc/lib.rs"
+
+[dependencies]
+wasm-bindgen = "0.2.87"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3.37"
+
+[profile.release]
+opt-level = "s"

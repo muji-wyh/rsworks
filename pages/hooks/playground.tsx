@@ -1,17 +1,25 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useCallback } from 'react'
 import Layout from '@/app/components/Layout'
-import { work } from '../../wasms/wasmworks'
+import { useT1 } from './myHooks'
 
 export default function C() {
-    useEffect(() => {
-        console.info(123, work())
-    }, [])
+    const { num, setter } = useT1()
+
+    const handleClick = useCallback(() => {
+        setter(num + 1)
+    }, [num])
 
     return (
         <Layout>
-            <p className="tips">wasm</p>
+            <p className="tips">hooks</p>
+
+            <p>
+                <span className="">num: {num}</span>
+
+                <button onClick={handleClick}>click</button>
+            </p>
 
             <style jsx>{`
                 .tips {

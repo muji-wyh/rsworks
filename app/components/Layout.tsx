@@ -28,6 +28,8 @@ export default function Layout({ children }: { children: any }) {
                 ['three', [<Link href="/three/playground">playground</Link>]],
 
                 ['cv', [<Link href="/cv/playground">playground</Link>]],
+
+                ['hooks', [<Link href="/hooks/playground">hooks</Link>]],
             ] as [label: string, subs: any[]][],
         []
     )
