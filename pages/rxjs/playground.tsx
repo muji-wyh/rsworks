@@ -2,35 +2,51 @@
 
 import React, { useEffect } from 'react'
 import Layout from '@/app/components/Layout'
-import { connectable, of, from, Subject, interval } from 'rxjs'
+import { connectable, of, from, Subject, interval, BehaviorSubject } from 'rxjs'
 import { tap, take } from 'rxjs/operators'
 
 export default function C() {
     useEffect(() => {
-        const obs1$ = connectable(interval(500).pipe(take(5)), {
-            connector: () => new Subject(),
-        })
+        function dec<T extends { new (...args: any[]): {} }>(ctor: T) {
+            console.log('>>> dec:', ctor, b)
+            return class extends ctor {
+                'sub' = 'sub report'
+            }
+        }
 
-        const obs2$ = interval(500).pipe(take(5))
+        const dec2 = <T extends { new (...args: any[]): {} }>() => {}
 
-        const obs$ = obs1$
+        @dec
+        class Report {
+            type = 'report'
+            title: string
 
-        obs$.subscribe((d) => {
-            window.console.info('>>> 1-', d)
-        })
+            constructor(t: string) {
+                this.title = t
+            }
+        }
 
-        obs$.subscribe((d) => {
-            window.console.info('>>> 2-', d)
-        })
+        const report = new Report('111')
 
-        obs$.connect()
+        console.log('>>> report', report.title, report.type, report.sub)
     }, [])
 
     return (
         <Layout>
             <p className="tips">rxjs playground</p>
 
+            <p className="a">aaa</p>
+            <p className="b">bbb</p>
+
             <style jsx>{`
+                .a {
+                    margin-bottom: 88px;
+                }
+
+                .b {
+                    margin-top: 88px;
+                }
+
                 .tips {
                     color: #aaa;
                     font-size: 24px;
