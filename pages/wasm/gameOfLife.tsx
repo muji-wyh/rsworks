@@ -2,26 +2,55 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Layout from '@/app/components/Layout'
-import { start_game, type State } from '../../wasms/wasmworks'
-import { Button } from '@byted-image/lv-components'
+import { start_game, type State } from '@/wasms/wasms-optimized/wasmworks'
+import { Button, Radio } from '@byted-image/lv-components'
+import { GameOfLife } from '@/pages/wasm/game-of-life/game'
 
-export default function C() {
-    const x_size = 200
-    const y_size = 200
-    const cell_padding = 1
-    const total_size = x_size * y_size
-    const alive_color = '#000'
-    const died_color = '#f0f0f0'
+const RadioGroup = Radio.Group
+const x_size = 100
+const y_size = 100
+const cell_padding = 1
+const total_size = x_size * y_size
+const alive_color = '#000'
+const died_color = '#f0f0f0'
+const mute_draw = false
+
+const debounce_number = 0
+
+const default_cells_1: number[] = []
+const default_cells = default_cells_1
+
+for (let i = 0; i < total_size; ++i) {
+    if (i % 3 === 0 || i % 7 === 0) {
+        default_cells_1.push(i)
+    }
+}
+
+type Type = 'js' | 'wasm-not-optimized'
+
+interface MainProps {
+    onPreDraw: () => void
+    onPostDraw: () => void
+}
+
+const Main = ({ onPreDraw, onPostDraw }: MainProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const contextRef = useRef<CanvasRenderingContext2D | null>(null)
     const cellSizeXRef = useRef<number>(-1)
     const cellSizeYRef = useRef<number>(-1)
     const [started, setStarted] = useState(false)
+    const [use, setUse] = useState<Type>('js')
+    const debounce_state = useRef(0)
 
     const { game } = useMemo(() => {
-        const result = start_game(x_size, y_size)
-        return { game: result }
-    }, [])
+        if (use === 'js') {
+            return {
+                game: new GameOfLife(x_size, y_size),
+            }
+        }
+
+        return { game: start_game(x_size, y_size) }
+    }, [use])
 
     const init = useCallback(() => {
         const dpr = window.devicePixelRatio
@@ -34,39 +63,46 @@ export default function C() {
         contextRef.current = canvas.getContext('2d')!
         cellSizeXRef.current = canvas.width / x_size
         cellSizeYRef.current = canvas.height / y_size
-
-        // @ts-ignore
-        window.game = game
     }, [])
 
     const draw = useCallback(
-        (tickWhenFinish: boolean = false) => {
-            const cell_size_x = cellSizeXRef.current
-            const cell_size_y = cellSizeYRef.current
-            const context = contextRef.current!
+        (muteDraw = false) => {
+            if (!muteDraw) {
+                debounce_state.current++
 
-            for (let i = 0; i < total_size; ++i) {
-                context.fillStyle = game.get_alive(i) ? alive_color : died_color
+                if (
+                    !debounce_number ||
+                    debounce_state.current % debounce_number === 0
+                ) {
+                    const cell_size_x = cellSizeXRef.current
+                    const cell_size_y = cellSizeYRef.current
+                    const context = contextRef.current!
+                    for (let i = 0; i < total_size; ++i) {
+                        context.fillStyle = game.get_alive(i)
+                            ? alive_color
+                            : died_color
 
-                const row = Math.floor(i / x_size)
-                const col = i % x_size
+                        const row = Math.floor(i / x_size)
+                        const col = i % x_size
 
-                const x = col * cell_size_x
-                const y = row * cell_size_y
+                        const x = col * cell_size_x
+                        const y = row * cell_size_y
 
-                context.fillRect(
-                    x + cell_padding,
-                    y + cell_padding,
-                    cell_size_x - 2 * cell_padding,
-                    cell_size_y - 2 * cell_padding
-                )
+                        context.fillRect(
+                            x + cell_padding,
+                            y + cell_padding,
+                            cell_size_x - 2 * cell_padding,
+                            cell_size_y - 2 * cell_padding
+                        )
+                    }
+                }
             }
 
             if (started) {
                 game.next_ticket()
             }
         },
-        [started]
+        [started, game]
     )
 
     useEffect(() => {
@@ -76,42 +112,81 @@ export default function C() {
 
         const loop = () => {
             rafId = self.requestAnimationFrame(() => {
-                draw()
+                onPreDraw()
+                draw(mute_draw)
+                onPostDraw()
                 loop()
             })
         }
 
         loop()
 
-        return () => self.cancelAnimationFrame(rafId)
-    })
-
-    const handleMouseMove = useCallback((e: React.MouseEvent) => {
-        const dpr = window.devicePixelRatio
-        e.preventDefault()
-
-        const { offsetX, offsetY } = e.nativeEvent
-        const row = Math.floor(offsetY / (cellSizeYRef.current / dpr))
-        const col = Math.floor(offsetX / (cellSizeXRef.current / dpr))
-        const index = row * x_size + col
-
-        if (e.buttons !== 1) {
-            return
+        return () => {
+            self.cancelAnimationFrame(rafId)
         }
+    }, [game, started])
 
-        game.set_alive(index, true)
-    }, [])
+    const handleMouseMove = useCallback(
+        (e: React.MouseEvent) => {
+            const dpr = window.devicePixelRatio
+            e.preventDefault()
+
+            const { offsetX, offsetY } = e.nativeEvent
+            const row = Math.floor(offsetY / (cellSizeYRef.current / dpr))
+            const col = Math.floor(offsetX / (cellSizeXRef.current / dpr))
+            const index = row * x_size + col
+
+            if (e.buttons !== 1) {
+                return
+            }
+
+            game.set_alive(index, true)
+        },
+        [game]
+    )
 
     const handleStart = useCallback(() => {
+        if (!started && !default_cells.length) {
+            // @ts-ignore
+            window.__cells = []
+
+            for (let i = 0; i < total_size; ++i) {
+                if (!game.get_alive(i)) {
+                    continue
+                }
+
+                // @ts-ignore
+                window.__cells.push(i)
+            }
+        }
+
         setStarted(!started)
-    }, [started])
+    }, [started, game])
+
+    const handleTypeChange = useCallback((type: Type) => {
+        setUse(type)
+    }, [])
+
+    const handleLoad = useCallback(() => {
+        // @ts-ignore
+        ;(window.__cells || default_cells)?.forEach((i) =>
+            game.set_alive(i, true)
+        )
+    }, [game])
 
     return (
-        <Layout>
-            <div className="">
+        <div>
+            <div className="handlers">
+                <RadioGroup value={use} onChange={handleTypeChange}>
+                    <Radio value="js">js</Radio>
+                    <Radio value="wasm-not-optimized">wasm</Radio>
+                </RadioGroup>
+
                 <Button onClick={handleStart}>
                     {started ? 'stop' : 'start'}
                 </Button>
+
+                <Button onClick={handleLoad}>load</Button>
             </div>
 
             <div className="canvas-wrap">
@@ -123,6 +198,12 @@ export default function C() {
             </div>
 
             <style jsx>{`
+                .handlers {
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                }
+
                 .canvas-wrap {
                     padding: 10px;
                     background: #777;
@@ -137,6 +218,48 @@ export default function C() {
                     }
                 }
             `}</style>
+        </div>
+    )
+}
+
+export default function C() {
+    const [frameDelta, setFrameDelta] = useState(0)
+
+    let preDrawTime = 0
+
+    const handlePreDraw = useCallback(() => {
+        preDrawTime = performance.now()
+    }, [])
+
+    const handlePostDraw = useCallback(() => {
+        const now = performance.now()
+        setFrameDelta(+(now - preDrawTime).toFixed(2))
+    }, [])
+
+    return (
+        <Layout>
+            <div className="comp">
+                <div className="workbench">
+                    <div className="">
+                        frame time: <span className="">{frameDelta} ms</span>
+                    </div>
+
+                    <div className="">
+                        FPS:{' '}
+                        <span className="">
+                            {(1000 / frameDelta).toFixed(2)}
+                        </span>
+                    </div>
+                </div>
+
+                <Main onPreDraw={handlePreDraw} onPostDraw={handlePostDraw} />
+
+                <style jsx>{`
+                    .workbench {
+                        padding: 0 16px;
+                    }
+                `}</style>
+            </div>
         </Layout>
     )
 }

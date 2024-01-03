@@ -2,13 +2,8 @@
 
 import React, { useEffect } from 'react'
 import Layout from '@/app/components/Layout'
-import { work } from '../../wasms/wasmworks'
 
 export default function C() {
-    useEffect(() => {
-        console.info(123, work())
-    }, [])
-
     return (
         <Layout>
             <p className="tips">wasm</p>
