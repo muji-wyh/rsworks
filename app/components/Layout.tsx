@@ -21,7 +21,13 @@ export default function Layout({ children }: { children: any }) {
                     ],
                 ],
 
-                ['wasm', [<Link href="/wasm/playground">playground</Link>]],
+                [
+                    'wasm',
+                    [
+                        <Link href="/wasm/playground">playground</Link>,
+                        <Link href="/wasm/gameOfLife">gameOfLife</Link>,
+                    ],
+                ],
 
                 ['webgpu', [<Link href="/webgpu/playground">playground</Link>]],
 

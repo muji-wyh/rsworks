@@ -1,4 +1,5 @@
 pub mod rustlings;
+mod game_of_life;
 
 use wasm_bindgen::prelude::*;
 
