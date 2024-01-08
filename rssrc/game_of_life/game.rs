@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
-pub struct State {
+pub struct Universe {
     x_size: usize,
     y_size: usize,
     size: usize,
@@ -11,7 +11,7 @@ pub struct State {
 }
 
 #[wasm_bindgen]
-impl State {
+impl Universe {
     fn new(x_size: usize, y_size: usize) -> Self {
         let size = x_size * y_size;
         Self {
@@ -123,11 +123,20 @@ impl State {
 
         self.cells = next_cells;
     }
+
+    pub fn log(str: &str) {
+        alert(&format!("- {}", str));
+    }
 }
 
 #[wasm_bindgen]
-pub fn start_game(x_size: usize, y_size: usize) -> State {
-    State::new(x_size, y_size)
+extern "C" {
+    fn alert(s: &str);
+}
+
+#[wasm_bindgen]
+pub fn start_game(x_size: usize, y_size: usize) -> Universe {
+    Universe::new(x_size, y_size)
 }
 
 #[test]

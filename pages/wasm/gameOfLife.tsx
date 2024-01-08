@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Layout from '@/app/components/Layout'
-import { start_game, type State } from '@/wasms/wasms-optimized/wasmworks'
+import { start_game, Universe } from '@/wasms/tmp/wasmworks'
 import { Button, Radio } from '@byted-image/lv-components'
 import { GameOfLife } from '@/pages/wasm/game-of-life/game'
 
@@ -63,7 +63,13 @@ const Main = ({ onPreDraw, onPostDraw }: MainProps) => {
         contextRef.current = canvas.getContext('2d')!
         cellSizeXRef.current = canvas.width / x_size
         cellSizeYRef.current = canvas.height / y_size
-    }, [])
+
+        // @ts-ignore
+        window.game = game
+
+        // @ts-ignore
+        window.Universe = Universe
+    }, [game])
 
     const draw = useCallback(
         (muteDraw = false) => {
