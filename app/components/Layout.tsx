@@ -11,8 +11,6 @@ export default function Layout({ children }: { children: any }) {
     const menuList = useMemo(
         () =>
             [
-                ['mobx', [<Link href="/mobx/playground">playground</Link>]],
-
                 [
                     'rxjs',
                     [
@@ -35,7 +33,14 @@ export default function Layout({ children }: { children: any }) {
 
                 ['cv', [<Link href="/cv/playground">playground</Link>]],
 
-                ['hooks', [<Link href="/hooks/playground">hooks</Link>]],
+                [
+                    'playground',
+                    [
+                        <Link href="/playground/message">message</Link>,
+                        <Link href="/playground/mobx">mobx</Link>,
+                        <Link href="/playground/hooks">hooks</Link>,
+                    ],
+                ],
             ] as [label: string, subs: any[]][],
         []
     )

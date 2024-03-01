@@ -4,10 +4,10 @@ import React from 'react'
 import Layout from '@/app/components/Layout'
 import { Tips } from '@/app/components/Tips'
 
-export default function Home() {
+export default function C() {
     return (
         <Layout>
-            <Tips>checkout menus</Tips>
+            <Tips>mobx</Tips>
         </Layout>
     )
 }

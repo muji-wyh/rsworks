@@ -2,20 +2,12 @@
 
 import React from 'react'
 import Layout from '@/app/components/Layout'
+import { Tips } from '@/app/components/Tips'
 
 export default function C() {
     return (
         <Layout>
-            <p className="tips">three</p>
-
-            <style jsx>{`
-                .tips {
-                    color: #aaa;
-                    font-size: 24px;
-                    text-align: center;
-                    margin-top: 30vh;
-                }
-            `}</style>
+            <Tips>three</Tips>
         </Layout>
     )
 }
