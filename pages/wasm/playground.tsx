@@ -3,35 +3,7 @@
 import React, { useCallback, useEffect } from 'react'
 import Layout from '@/app/components/Layout'
 import { Button } from '@byted-image/lv-components'
-
-const Demo = ({
-    children,
-    tips,
-}: React.PropsWithChildren<{ tips?: React.ReactNode }>) => {
-    return (
-        <>
-            <div className="demo">
-                {tips && <div className="tips">{tips}</div>}
-                {children}
-            </div>
-
-            <style jsx>{`
-                .tips {
-                    color: #aaa;
-                    font-size: 18px;
-                    margin-bottom: 20px;
-                    font-style: italic;
-                }
-
-                .demo {
-                    margin-bottom: 40px;
-                    padding: 16px;
-                    background: #f9f9f9;
-                }
-            `}</style>
-        </>
-    )
-}
+import { DemoBlock } from '@/app/components/DemoBlock'
 
 export default function C() {
     const demo1 = useCallback(async () => {
@@ -78,22 +50,13 @@ export default function C() {
 
     return (
         <Layout>
-            <Demo tips={<p>first wasm with s-expression</p>}>
+            <DemoBlock tips={<p>first wasm with s-expression</p>}>
                 <Button onClick={demo1}>run</Button>
-            </Demo>
+            </DemoBlock>
 
-            <Demo tips={<p>js 初始化内存，并在 wasm 中读取</p>}>
+            <DemoBlock tips={<p>js 初始化内存，并在 wasm 中读取</p>}>
                 <Button onClick={demo2}>run</Button>
-            </Demo>
-
-            <style jsx>{`
-                .tips {
-                    color: #aaa;
-                    font-size: 24px;
-                    text-align: center;
-                    margin-top: 30vh;
-                }
-            `}</style>
+            </DemoBlock>
         </Layout>
     )
 }
