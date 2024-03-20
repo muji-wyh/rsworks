@@ -7,6 +7,10 @@ import { tap, take } from 'rxjs/operators'
 import { Tips } from '@/app/components/Tips'
 
 export default function C() {
+    useEffect(() => {
+        //
+    }, [])
+
     return (
         <Layout>
             <Tips>rxjs playground</Tips>
