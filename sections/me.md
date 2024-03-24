@@ -1,5 +1,5 @@
 Hello, my name is wangyaohui, I am from HeBei province. After graduating, I have been working as a front-end developer
-and I write nodejs too. I love front end development, and I think it's a greet job deserved to persist to do
+and I wrote nodejs too. I love front end development, and I think it's a greet job deserved to persist to do
 
 I went to a compony named anjuke after I was graduated, it's my first work, doing front end development,
 at that time, I use javascript and jQuery and plain css and even flash, and I did a lot
