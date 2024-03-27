@@ -17,6 +17,11 @@ import { Tips } from '@/app/components/Tips'
 
 const win = []
 
+enum blackAndWhite {
+    blackAndWhite = 'blackAndWhite',
+    sepia = 'sepia',
+}
+
 const myFetch = async (): Promise<{ label: string }[]> => {
     return new Promise((resolve) => {
         setTimeout(() => {
@@ -80,6 +85,70 @@ const useReachBottom = ({
 }
 
 export default function C() {
+    /**
+     第二题：
+
+     给定一组点云数据（在二维空间中），实现一个函数，该函数接受一个查询点和一个整数k作为参数，并返回距离该查询点最近的k个点。
+
+     示例输入：
+
+     点云数据：[[1, 2], [2, 3], [3, 4], [5, 5], [1, -1]]
+     查询点：[2, 2]
+
+
+
+     2 * n + 1
+     2 * n + 2
+     Math.floor((n - 1) / 2)
+
+     k = 3
+     示例输出：
+
+     [[1, 2], [2, 3], [3, 4]]
+     要求：
+
+     可以假设所有输入都是有效的。
+     如果有多个点与查询点的距离相同，则返回任意k个这样的点。
+     */
+
+    type P = [number, number]
+
+    const dis = (p1: P, p2: P) => {
+        //
+        return 0
+    }
+
+    const left = (n: number) => 2 * n + 1
+
+    const right = (n: number) => 2 * n + 2
+
+    const root = (n: number) => Math.floor((n - 1) / 2)
+
+    type Node = {
+        dis: number
+        cord: P
+    }
+
+    /**
+     *  [root] 0
+     *      [c1] 1     [c2] 2
+     *      [] []
+     */
+    const process1 = (heap: Node[], node: Node) => {
+        // todo
+    }
+
+    const process = (ary: P[], point: P, k: number) => {
+        const heap = Array(ary.length)
+
+        ary.forEach((p, i) => {
+            const distance = dis(p, point)
+            process1(heap, { dis: distance, cord: p })
+        })
+
+        return heap
+    }
+
     const [list, setList] = useState<{ label: string }[]>(
         Array(20)
             .fill(null)
